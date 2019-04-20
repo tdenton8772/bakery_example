@@ -16,20 +16,33 @@ import grpc_query_pb2
 import grpc_query_pb2_grpc
 
 def process_file(file_name):
+#    with grpc.insecure_channel('localhost:8081') as channel:
+#        stub = grpc_config_pb2_grpc.DatabaseServiceStub(channel)
+#        response = stub.Connect(grpc_config_pb2.InitiateConnection(clusterUser="Administrator",
+#                                                                    clusterPW="Hello",
+#                                                                    version="4.5.1",
+#                                                                    clusterAddress= ["127.0.0.1"],
+#                                                                    kvTimeout= 9000,
+#                                                                    queryTimeout= 9000,
+#                                                                    DBMainPassword= "main",
+#                                                                    DBTxnPassword= "txn",
+#                                                                    DBHxnPassword= "hxn",
+#                                                                    DBMain= "main",
+#                                                                    DBTxn= "txv",
+#                                                                    DBHxn= "hxn"))
+#        print(response)
+    
     with grpc.insecure_channel('localhost:8081') as channel:
         stub = grpc_config_pb2_grpc.DatabaseServiceStub(channel)
         response = stub.Connect(grpc_config_pb2.InitiateConnection(clusterUser="Administrator",
-                                                                    clusterPW="Hello",
-                                                                    version="4.5.1",
-                                                                    clusterAddress= ["127.0.0.1"],
+                                                                    clusterPW="76;AkB_d",
+                                                                    version="6.0.1",
+                                                                    clusterAddress= ["cbdata-101.dev.archerdx.com"],
                                                                     kvTimeout= 9000,
                                                                     queryTimeout= 9000,
-                                                                    DBMainPassword= "main",
-                                                                    DBTxnPassword= "txn",
-                                                                    DBHxnPassword= "hxn",
-                                                                    DBMain= "main",
-                                                                    DBTxn= "txv",
-                                                                    DBHxn= "hxn"))
+                                                                    DBMain= "erp",
+                                                                    DBTxn= "txn",
+                                                                    DBHxn= "history"))
         print(response)
         
     with grpc.insecure_channel('localhost:8080') as channel:
@@ -37,7 +50,7 @@ def process_file(file_name):
         with open(file_name) as csvfile:
             freader = csv.DictReader(csvfile, delimiter=",", quotechar="|")
             for row in freader:
-                docID = "{}_{}".format(row['Date'], row['Time'])
+                docID = "{}_{}_{}".format(row['Transaction'], row['Date'], row['Time'])
                 message = row
                 _Item = message['Item']
                 message['Item'] = []
@@ -46,8 +59,16 @@ def process_file(file_name):
                 response = stub.kvUpsert(grpc_query_pb2.JsonID(docID = docID,
                                                             document = json.dumps(message)))
                 print(response)
-            
-
+#    with open(file_name) as csvfile:
+#        freader = csv.DictReader(csvfile, delimiter=",", quotechar="|")        
+#        for row in freader:
+#            docID = "{}_{}".format(row['Date'], row['Time'])
+#            message = row
+#            _Item = message['Item']
+#            message['Item'] = []
+#            message['Item'].append(_Item)
+#            message['jsonType'] = "transaction"
+#            print(json.dumps(message))
 
 if __name__ == "__main__":
-    process_file("/home/tdenton/Desktop/Development/BreadBasket_DMS.csv")
+    process_file("../resources/BreadBasket_DMS.csv")
