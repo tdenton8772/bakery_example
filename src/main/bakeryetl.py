@@ -14,6 +14,9 @@ import grpc_config_pb2
 import grpc_config_pb2_grpc
 import grpc_query_pb2
 import grpc_query_pb2_grpc
+import database_pb2
+
+from google.protobuf.any_pb2 import Any
 
 def process_file(file_name):
 #    with grpc.insecure_channel('localhost:8081') as channel:
@@ -59,6 +62,14 @@ def process_file(file_name):
                 response = stub.kvUpsert(grpc_query_pb2.JsonID(docID = docID,
                                                             document = json.dumps(message)))
                 print(response)
+            
+            
+            message = grpc_query_pb2.AnyID(docID = "1234")
+            anyMessage = Any()
+            anyMessage.Pack(database_pb2.TxnLog(doc_id = "1234"))
+            message.details.extend([anyMessage])
+            stub.anyService(message)
+#                                                    details = [database_pb2.TxnLog(doc_id = "1234")].))
 #    with open(file_name) as csvfile:
 #        freader = csv.DictReader(csvfile, delimiter=",", quotechar="|")        
 #        for row in freader:
