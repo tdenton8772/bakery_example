@@ -69,17 +69,7 @@ def process_file(file_name):
             anyMessage.Pack(database_pb2.TxnLog(doc_id = "1234"))
             message.details.extend([anyMessage])
             stub.anyService(message)
-#                                                    details = [database_pb2.TxnLog(doc_id = "1234")].))
-#    with open(file_name) as csvfile:
-#        freader = csv.DictReader(csvfile, delimiter=",", quotechar="|")        
-#        for row in freader:
-#            docID = "{}_{}".format(row['Date'], row['Time'])
-#            message = row
-#            _Item = message['Item']
-#            message['Item'] = []
-#            message['Item'].append(_Item)
-#            message['jsonType'] = "transaction"
-#            print(json.dumps(message))
+
 
 if __name__ == "__main__":
     process_file("../resources/BreadBasket_DMS.csv")
