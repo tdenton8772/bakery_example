@@ -14,7 +14,8 @@ import grpc_config_pb2
 import grpc_config_pb2_grpc
 import grpc_query_pb2
 import grpc_query_pb2_grpc
-import database_pb2
+
+from database import *
 
 from google.protobuf.any_pb2 import Any
 
@@ -64,12 +65,21 @@ def process_file(file_name):
                 print(response)
             
             
-            message = grpc_query_pb2.AnyID(docID = "1234")
-            anyMessage = Any()
-            anyMessage.Pack(database_pb2.TxnLog(doc_id = "1234"))
-            message.details.extend([anyMessage])
-            stub.anyService(message)
+        message = grpc_query_pb2.AnyID(docID = "1234")
+        anyMessage = Any()
+        anyMessage.Pack(database_pb2.TxnLog(doc_id = "1234"))
+        message.details.extend([anyMessage])
+        response = stub.anyService(message)
+        print(response)
 
-
+        message = grpc_query_pb2.AnyID(docID="1234_opportunity")
+        anyMessage = Any()
+        anyMessage.Pack(opportunity_pb2.NewOpportunity(docID = "1234_opportunity",
+                                                        active = True,
+                                                        jsonType="opportunity"))
+        message.details.extend([anyMessage])
+        response = stub.anyService(message)
+        print(response)
+            
 if __name__ == "__main__":
     process_file("../resources/BreadBasket_DMS.csv")
