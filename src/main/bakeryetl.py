@@ -35,51 +35,56 @@ def process_file(file_name):
 #                                                                    DBTxn= "txv",
 #                                                                    DBHxn= "hxn"))
 #        print(response)
-    
-    with grpc.insecure_channel('localhost:8081') as channel:
-        stub = grpc_config_pb2_grpc.DatabaseServiceStub(channel)
-        response = stub.Connect(grpc_config_pb2.InitiateConnection(clusterUser="Administrator",
-                                                                    clusterPW="76;AkB_d",
-                                                                    version="6.0.1",
-                                                                    clusterAddress= ["cbdata-101.dev.archerdx.com"],
-                                                                    kvTimeout= 9000,
-                                                                    queryTimeout= 9000,
-                                                                    DBMain= "erp",
-                                                                    DBTxn= "txn",
-                                                                    DBHxn= "history"))
-        print(response)
-        
-    with grpc.insecure_channel('localhost:8080') as channel:
-        stub = grpc_query_pb2_grpc.QueryServiceStub(channel)
-        with open(file_name) as csvfile:
-            freader = csv.DictReader(csvfile, delimiter=",", quotechar="|")
-            for row in freader:
-                docID = "{}_{}_{}".format(row['Transaction'], row['Date'], row['Time'])
-                message = row
-                _Item = message['Item']
-                message['Item'] = []
-                message['Item'].append(_Item)
-                message['jsonType'] = "transaction"
-                response = stub.kvUpsert(grpc_query_pb2.JsonID(docID = docID,
-                                                            document = json.dumps(message)))
-                print(response)
-            
-            
-        message = grpc_query_pb2.AnyID(docID = "1234")
-        anyMessage = Any()
-        anyMessage.Pack(database_pb2.TxnLog(doc_id = "1234"))
-        message.details.extend([anyMessage])
-        response = stub.anyService(message)
-        print(response)
+    try:
+        with grpc.insecure_channel('127.0.0.1:8081') as channel:
+            stub = grpc_config_pb2_grpc.DatabaseServiceStub(channel)
+            message = grpc_config_pb2.InitiateConnection(clusterUser="Administrator",
+                                                                        clusterPW="76;AkB_d",
+                                                                        version="6.0.1",
+                                                                        clusterAddress= ["cbdata-101.dev.archerdx.com"],
+                                                                        kvTimeout= 9000,
+                                                                        queryTimeout= 9000,
+                                                                        DBMain= "erp",
+                                                                        DBTxn= "txn",
+                                                                        DBHxn= "history")
+            print(message)
+            response = stub.Connect(message)
+            print(response)
+    except Exception as e:
+        print(e)
+    try:
+        with grpc.insecure_channel('127.0.0.1:8080') as channel:
+            stub = grpc_query_pb2_grpc.QueryServiceStub(channel)
+            with open(file_name) as csvfile:
+                freader = csv.DictReader(csvfile, delimiter=",", quotechar="|")
+                for row in freader:
+                    docID = "{}_{}_{}".format(row['Transaction'], row['Date'], row['Time'])
+                    message = row
+                    _Item = message['Item']
+                    message['Item'] = []
+                    message['Item'].append(_Item)
+                    message['jsonType'] = "transaction"
+                    response = stub.kvUpsert(grpc_query_pb2.JsonID(docID = docID,
+                                                                document = json.dumps(message)))
+                    print(response)
 
-        message = grpc_query_pb2.AnyID(docID="1234_opportunity")
-        anyMessage = Any()
-        anyMessage.Pack(opportunity_pb2.NewOpportunity(docID = "1234_opportunity",
-                                                        active = True,
-                                                        jsonType="opportunity"))
-        message.details.extend([anyMessage])
-        response = stub.anyService(message)
-        print(response)
-            
+
+            message = grpc_query_pb2.AnyID(docID = "1234")
+            anyMessage = Any()
+            anyMessage.Pack(database_pb2.TxnLog(doc_id = "1234"))
+            message.details.extend([anyMessage])
+            response = stub.anyService(message)
+            print(response)
+
+            message = grpc_query_pb2.AnyID(docID="1234_opportunity")
+            anyMessage = Any()
+            anyMessage.Pack(opportunity_pb2.NewOpportunity(docID = "1234_opportunity",
+                                                            active = True,
+                                                            jsonType="opportunity"))
+            message.details.extend([anyMessage])
+            response = stub.anyService(message)
+            print(response)
+    except Exception as e:
+        print(e)
 if __name__ == "__main__":
-    process_file("../resources/BreadBasket_DMS.csv")
+    process_file("../resources/BreadBasket_DMS_1.csv")

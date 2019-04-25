@@ -11,7 +11,10 @@ git clone https://github.com/tdenton8772/bakery_example.git
 
 protoc -I=/usr/local/include/ -I=/opt/cb_grpc/src/main/proto/api/ --python_out=/opt/bakery_example/src/main/ /opt/cb_grpc/src/main/proto/api/gRPC/*.proto
 
-protoc -I=/usr/local/include/ -I=/opt/cb_grpc/src/main/proto/api/ --python_out=/opt/bakery_example/src/main/ /opt/cb_grpc/src/main/proto/api/database/*.proto`
+protoc -I=/usr/local/include/ -I=/opt/cb_grpc/src/main/proto/api/ --python_out=/opt/bakery_example/src/main/ /opt/cb_grpc/src/main/proto/api/database/*.proto
+
+python -m grpc_tools.protoc -I=/opt/cb_grpc/src/main/proto/ --python_out=/opt/bakery_example/src/main/ --grpc_python_out=/opt/bakery_example/src/main/ /opt/cb_grpc/src/main/proto/api/gRPC/*.proto
+
 
 python /opt/bakery_example/src/main/bakeryetl.py 
 ```
